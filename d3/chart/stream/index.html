@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Streamgraph</title>
+    
+    <script type="text/javascript" src="../../d3.v2.js"></script>
+    <script type="text/javascript" src="../charts.js"></script>
+    <script type="text/javascript" src="stream_layers.js"></script>
+    <script type="text/javascript" src="stream_chart.js"></script>
+    
+    <link type="text/css" rel="stylesheet" href="../button.css"/>
+    <style type="text/css">
+        .layer {
+            stroke: red;
+            stroke-width: 1px;
+        }
+    </style>
+</head>
+<body>
+    <button class="first last" onclick="transition()">Update</button>
+    <div class="chart">
+    </div>
+    <div class="chart">
+    </div>
+    <script>
+        var n = 20, // number of layers
+            m = 200; // number of samples per layer
+
+        var data1 = [stream_layers(n, m), stream_layers(n / 2, m / 2)];
+        var data0 = [data1[1], data1[0]];
+        var colors = d3.range(n).map(function() { return d3.interpolateRgb("#aad", "#556")(Math.random()); });
+
+        var streamChart = d3.chart.stream()
+            .margin({top: 10, right: 10, bottom: 10, left: 10})
+            .offset("silhouette")
+            .attr("fill", function(d, i) { return colors[i]; }) // use same colors for both data sets
+            .on("mouseover", fade(.2))
+            .on("mouseout", fade(1));
+
+        d3.selectAll(".chart")
+            .data(data0)
+            .call(streamChart);
+
+        function transition() {
+            d3.selectAll(".chart")
+                .data(function() {
+                    var d = data1;
+                    data1 = data0;
+                    return data0 = d;
+                })
+                .transition()
+                .duration(1500)
+                .call(streamChart);
+        }
+
+        function fade(opacity) {
+            return function(d, i) {
+                d3.selectChart(this).selectAll(".layer")
+                    .filter(function(h, j) {
+                        return j != i;
+                    })
+                    .transition()
+                    .duration(500)
+                    .style("opacity", opacity);
+            }
+        }
+    </script>
+</body>
+</html>
