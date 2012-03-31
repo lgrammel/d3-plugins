@@ -3,7 +3,7 @@
 <head>
     <title>Streamgraph</title>
     
-    <script type="text/javascript" src="../../d3.v2.js"></script>
+    <script type="text/javascript" src="../d3.v2.js"></script>
     <script type="text/javascript" src="../charts.js"></script>
     <script type="text/javascript" src="stream_layers.js"></script>
     <script type="text/javascript" src="stream_chart.js"></script>
@@ -26,7 +26,7 @@
         var n = 20, // number of layers
             m = 200; // number of samples per layer
 
-        var data1 = [stream_layers(n, m), stream_layers(n / 2, m / 2)];
+        var data1 = [stream_layers(n, m), stream_layers(n / 2, m)];
         var data0 = [data1[1], data1[0]];
         var colors = d3.range(n).map(function() { return d3.interpolateRgb("#aad", "#556")(Math.random()); });
 
@@ -35,10 +35,13 @@
             .offset("silhouette")
             .attr("fill", function(d, i) { return colors[i]; }) // use same colors for both data sets
             .on("mouseover", fade(.2))
-            .on("mouseout", fade(1));
+            .on("mouseout", fade(1))
+            .key(function(d, i) { return i; });
 
         d3.selectAll(".chart")
             .data(data0)
+            .transition()
+            .duration(1500)
             .call(streamChart);
 
         function transition() {
